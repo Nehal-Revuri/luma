@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Knowledge base information",
+    "content": "This knowledge base is a rudimentary way of manually updating what you know and remember. In the future, incorporation of RSS feeds and other systems will keep you up to date."
+  },
+  {
+    "title": "Current year",
+    "content": "The current year is 2026. The user is building LUMA Lite, a local terminal assistant using Ollama and Python."
+  },
+  {
+    "title": "LUMA architecture",
+    "content": "LUMA uses Ollama locally, streams responses, keeps short-term chat history, stores memory in JSON, and has Python tools for actions like opening and closing apps."
+  },
+  {
+    "title": ""
+  }
+
+]

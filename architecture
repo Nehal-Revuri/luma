@@ -1,0 +1,14 @@
+src/
+- main.py
+- core/
+	- __init__.py
+	- tts.py
+	- config.py
+	- memory.py
+	- llm.py
+	- router.py
+- tools
+	- __init__.py
+	- apps.py
+	- files.py
+	- notis.py

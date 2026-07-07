@@ -1,0 +1,11 @@
+.venv/
+venv/
+env/
+src/core/vision/venv/
+vision_lab/.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.zip
+*.pt
+*.onnx
