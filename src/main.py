@@ -10,6 +10,7 @@ from core.audio.stt import LumaListener
 from core.audio.normalize import normalize_command
 from core.router import ask_luma_for_tool, might_be_file_action
 from core.configs.personality import SPECIFIC_RESPONSES
+from core.vision.manager import vision
 
 from core import server
 
@@ -17,27 +18,44 @@ from tools.apps import open_app, close_app
 from tools.files import delete_file_by_query, find_and_reveal_file
 from tools.notis import battery_status, hardware_status, downloads_status
 from tools.camera import turn_on_webcam, turn_off_webcam, enable_inspect_mode, inspect_this_area
+from tools.screen import capture_screen
+
+SCREEN_COMMANDS = {
+    "whats on my screen",
+    "what is on my screen",
+    "analyze screen",
+    "analyze my screen",
+    "screen",
+    "what am i looking at",
+}
 
 def handle_local_command(user_input):
+
     command = normalize_command(user_input)
 
+    if command in SCREEN_COMMANDS:
+        return {
+            "type": "screen_analysis",
+            "path": capture_screen(),
+        }
+
     if command.startswith("open "):
-        return open_app(command[5:].strip())
+        return {"type": "message", "text": open_app(command[5:].strip())}
 
     if command.startswith("close "):
-        return close_app(command[6:].strip())
+        return {"type": "message", "text": close_app(command[6:].strip())}
 
     if command.startswith("delete "):
-        return delete_file_by_query(command[7:].strip())
+        return {"type": "message", "text": delete_file_by_query(command[7:].strip())}
 
     if command in {"battery", "battery status", "check battery"}:
-        return battery_status()
+        return {"type": "message", "text": battery_status()}
 
     if command in {"hardware", "hardware status", "system status", "htop"}:
-        return hardware_status()
+        return {"type": "message", "text": hardware_status()}
 
     if command in {"downloads", "downloads status", "check downloads"}:
-        return downloads_status()
+        return {"type": "message", "text": downloads_status()}
 
     if command in {
         "turn on webcam",
@@ -50,7 +68,8 @@ def handle_local_command(user_input):
         "enable webcam",
         "enable camera",
     }:
-        return turn_on_webcam()
+
+        return {"type": "message", "text": turn_on_webcam()}
 
     if command in {
         "turn off webcam",
@@ -62,7 +81,8 @@ def handle_local_command(user_input):
         "disable webcam",
         "disable camera",
     }:
-        return turn_off_webcam()
+
+        return {"type": "message", "text": turn_off_webcam()}
 
     if command in {
         "inspect",
@@ -70,12 +90,10 @@ def handle_local_command(user_input):
         "enable inspect",
         "inspect mode",
     }:
-        return enable_inspect_mode()
-
+        return {"type": "message", "text": enable_inspect_mode()}
     return None
-
-
 def is_inspect_area_command(command: str) -> bool:
+
     return command in {
         "inspect this area",
         "inspect area",
@@ -86,19 +104,15 @@ def is_inspect_area_command(command: str) -> bool:
         "what is in this area",
     }
 
-
 def handle_ai_tool(user_input):
     if not might_be_file_action(user_input):
         return None
-
     tool_call = ask_luma_for_tool(user_input)
 
     if tool_call.get("tool") == "find_and_reveal_file":
         query = tool_call.get("args", {}).get("query", "").strip()
-
         if query:
             return find_and_reveal_file(query)
-
     return None
 
 def start_api_server():
@@ -106,9 +120,14 @@ def start_api_server():
         server.app,
         host="127.0.0.1",
         port=8765,
-        log_level="warning"
+        log_level="warning",
     )
 
+def speak_message(speaker, text):
+
+    print(f"LUMA: {text}")
+
+    speaker.say(text)
 def main():
     print("LUMA Lite booting...")
     warmup()
